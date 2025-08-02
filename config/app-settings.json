@@ -1,0 +1,488 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "environment": "development",
+  "app": {
+    "name": "SEO Automation for Shopify",
+    "version": "1.0.0",
+    "description": "Comprehensive SEO automation tool powered by Claude AI",
+    "author": "SEO Automation Team",
+    "website": "https://seoautomation.app",
+    "support": "support@seoautomation.app"
+  },
+  "features": {
+    "coreFeatures": {
+      "seoAnalysis": {
+        "enabled": true,
+        "description": "Comprehensive SEO analysis of products, collections, and pages",
+        "supportedTypes": ["product", "collection", "page", "blog", "article"]
+      },
+      "autoOptimization": {
+        "enabled": true,
+        "description": "Automatic SEO fixes for common issues",
+        "safeMode": true,
+        "backupRequired": true
+      },
+      "bulkOperations": {
+        "enabled": true,
+        "description": "Bulk analysis and optimization of multiple items",
+        "maxBatchSize": 100,
+        "concurrentOperations": 5
+      },
+      "realTimeUpdates": {
+        "enabled": true,
+        "description": "Real-time updates via WebSocket",
+        "reconnectInterval": 30000
+      }
+    },
+    "aiFeatures": {
+      "claudeIntegration": {
+        "enabled": true,
+        "description": "Claude AI integration for content generation and analysis",
+        "defaultModel": "claude-3-sonnet",
+        "fallbackModel": "claude-3-haiku"
+      },
+      "contentGeneration": {
+        "enabled": true,
+        "description": "AI-powered title and meta description generation",
+        "qualityThreshold": 0.8
+      },
+      "competitorAnalysis": {
+        "enabled": true,
+        "description": "AI-powered competitor analysis and gap identification",
+        "maxCompetitors": 5
+      },
+      "keywordAnalysis": {
+        "enabled": true,
+        "description": "Advanced keyword analysis and suggestions",
+        "includeSearchVolume": false
+      }
+    },
+    "advancedFeatures": {
+      "schemaGeneration": {
+        "enabled": true,
+        "description": "Automatic schema markup generation",
+        "validateSchema": true
+      },
+      "performanceMonitoring": {
+        "enabled": true,
+        "description": "SEO performance tracking and analytics",
+        "retentionDays": 90
+      },
+      "customRules": {
+        "enabled": true,
+        "description": "Custom SEO rules and templates",
+        "maxCustomRules": 50
+      },
+      "apiAccess": {
+        "enabled": false,
+        "description": "External API access for integrations",
+        "rateLimiting": true
+      }
+    },
+    "betaFeatures": {
+      "imageAnalysis": {
+        "enabled": false,
+        "description": "AI-powered image SEO analysis",
+        "experimental": true
+      },
+      "voiceSearch": {
+        "enabled": false,
+        "description": "Voice search optimization",
+        "experimental": true
+      },
+      "multilingual": {
+        "enabled": false,
+        "description": "Multi-language SEO support",
+        "experimental": true
+      }
+    }
+  },
+  "limits": {
+    "free": {
+      "analysesPerMonth": 100,
+      "bulkOperationSize": 10,
+      "storageRetention": 30,
+      "claudeRequests": 500,
+      "exportSize": 1000
+    },
+    "basic": {
+      "analysesPerMonth": 1000,
+      "bulkOperationSize": 50,
+      "storageRetention": 90,
+      "claudeRequests": 2000,
+      "exportSize": 5000
+    },
+    "professional": {
+      "analysesPerMonth": 5000,
+      "bulkOperationSize": 100,
+      "storageRetention": 180,
+      "claudeRequests": 10000,
+      "exportSize": 25000
+    },
+    "enterprise": {
+      "analysesPerMonth": -1,
+      "bulkOperationSize": 500,
+      "storageRetention": 365,
+      "claudeRequests": 50000,
+      "exportSize": -1
+    }
+  },
+  "scoring": {
+    "weights": {
+      "title": 25,
+      "metaDescription": 20,
+      "content": 20,
+      "images": 15,
+      "technical": 10,
+      "performance": 10
+    },
+    "thresholds": {
+      "excellent": 90,
+      "good": 70,
+      "needsImprovement": 50,
+      "poor": 30,
+      "critical": 0
+    },
+    "penalties": {
+      "duplicateTitle": -20,
+      "missingMeta": -15,
+      "thinContent": -10,
+      "missingAltText": -8,
+      "longTitle": -5
+    }
+  },
+  "automation": {
+    "scheduling": {
+      "enabled": true,
+      "defaultFrequency": "weekly",
+      "availableFrequencies": ["daily", "weekly", "monthly"],
+      "timezone": "UTC",
+      "maxScheduledJobs": 10
+    },
+    "webhooks": {
+      "enabled": true,
+      "supportedEvents": [
+        "product/created",
+        "product/updated",
+        "collection/created",
+        "collection/updated",
+        "page/created",
+        "page/updated"
+      ],
+      "retryAttempts": 3,
+      "timeout": 30000
+    },
+    "notifications": {
+      "channels": {
+        "email": {
+          "enabled": true,
+          "templates": {
+            "analysisComplete": "analysis-complete",
+            "issueDetected": "issue-detected",
+            "bulkComplete": "bulk-complete"
+          }
+        },
+        "inApp": {
+          "enabled": true,
+          "realTime": true,
+          "retention": 30
+        },
+        "slack": {
+          "enabled": false,
+          "webhookUrl": "",
+          "channel": "#seo-alerts"
+        },
+        "webhook": {
+          "enabled": false,
+          "url": "",
+          "secret": ""
+        }
+      },
+      "defaults": {
+        "analysisComplete": ["in_app"],
+        "criticalIssues": ["email", "in_app"],
+        "bulkComplete": ["in_app"],
+        "systemAlerts": ["email"]
+      }
+    }
+  },
+  "integrations": {
+    "shopify": {
+      "apiVersion": "2024-01",
+      "scopes": [
+        "read_products",
+        "write_products",
+        "read_content",
+        "write_content",
+        "read_themes",
+        "read_script_tags",
+        "write_script_tags"
+      ],
+      "webhookTopics": [
+        "products/create",
+        "products/update",
+        "collections/create",
+        "collections/update"
+      ]
+    },
+    "claude": {
+      "baseUrl": "https://api.anthropic.com",
+      "version": "2023-06-01",
+      "models": {
+        "primary": "claude-3-sonnet-20240229",
+        "fallback": "claude-3-haiku-20240307",
+        "experimental": "claude-3-opus-20240229"
+      },
+      "rateLimits": {
+        "requestsPerMinute": 50,
+        "tokensPerMinute": 40000,
+        "dailyTokenLimit": 1000000
+      },
+      "costLimits": {
+        "dailyLimit": 100,
+        "monthlyLimit": 2000,
+        "perRequestLimit": 5
+      }
+    },
+    "analytics": {
+      "googleAnalytics": {
+        "enabled": false,
+        "trackingId": "",
+        "events": ["seo_analysis", "optimization_applied", "bulk_operation"]
+      },
+      "mixpanel": {
+        "enabled": false,
+        "projectToken": "",
+        "trackUserActions": true
+      }
+    },
+    "external": {
+      "semrush": {
+        "enabled": false,
+        "apiKey": "",
+        "features": ["keyword_research", "competitor_analysis"]
+      },
+      "ahrefs": {
+        "enabled": false,
+        "apiKey": "",
+        "features": ["backlink_analysis", "keyword_difficulty"]
+      },
+      "screreamingFrog": {
+        "enabled": false,
+        "apiKey": "",
+        "features": ["technical_audit"]
+      }
+    }
+  },
+  "security": {
+    "encryption": {
+      "algorithm": "AES-256-GCM",
+      "keyRotation": 90,
+      "encryptSensitiveData": true
+    },
+    "rateLimiting": {
+      "enabled": true,
+      "rules": {
+        "general": {
+          "windowMs": 900000,
+          "max": 1000
+        },
+        "analysis": {
+          "windowMs": 60000,
+          "max": 10
+        },
+        "bulkOperations": {
+          "windowMs": 3600000,
+          "max": 5
+        }
+      }
+    },
+    "cors": {
+      "origin": ["https://*.myshopify.com", "https://admin.shopify.com"],
+      "credentials": true,
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    },
+    "contentSecurityPolicy": {
+      "defaultSrc": ["'self'"],
+      "scriptSrc": ["'self'", "'unsafe-inline'", "https://cdn.shopify.com"],
+      "styleSrc": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      "imgSrc": ["'self'", "data:", "https:"],
+      "connectSrc": ["'self'", "https://api.anthropic.com", "wss:"]
+    }
+  },
+  "performance": {
+    "caching": {
+      "enabled": true,
+      "defaultTtl": 3600,
+      "strategies": {
+        "analysis": 1800,
+        "shopData": 3600,
+        "claudeResponses": 7200,
+        "staticContent": 86400
+      },
+      "redis": {
+        "enabled": false,
+        "url": "redis://localhost:6379",
+        "keyPrefix": "seo-automation:"
+      }
+    },
+    "compression": {
+      "enabled": true,
+      "algorithm": "gzip",
+      "level": 6,
+      "threshold": 1024
+    },
+    "database": {
+      "connectionPool": {
+        "min": 2,
+        "max": 10,
+        "idle": 10000
+      },
+      "queryTimeout": 30000,
+      "indexOptimization": true
+    }
+  },
+  "monitoring": {
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "retention": 30,
+      "sensitiveFields": ["accessToken", "apiKey", "password"]
+    },
+    "metrics": {
+      "enabled": true,
+      "interval": 60000,
+      "retention": 7,
+      "exporters": ["prometheus", "datadog"]
+    },
+    "alerts": {
+      "errorRate": {
+        "threshold": 0.05,
+        "window": 300
+      },
+      "responseTime": {
+        "threshold": 2000,
+        "window": 300
+      },
+      "claudeCost": {
+        "dailyThreshold": 80,
+        "monthlyThreshold": 1800
+      }
+    },
+    "healthChecks": {
+      "enabled": true,
+      "interval": 30000,
+      "timeout": 5000,
+      "checks": ["database", "redis", "claude_api", "shopify_api"]
+    }
+  },
+  "ui": {
+    "theme": {
+      "default": "light",
+      "allowUserOverride": true,
+      "colors": {
+        "primary": "#007ace",
+        "secondary": "#5c6ac4",
+        "success": "#00a86b",
+        "warning": "#ffb700",
+        "error": "#d72c0d",
+        "neutral": "#6d7175"
+      }
+    },
+    "layout": {
+      "sidebar": {
+        "defaultCollapsed": false,
+        "allowCollapse": true
+      },
+      "dashboard": {
+        "defaultWidgets": [
+          "overview",
+          "recent_analyses",
+          "top_issues",
+          "quick_actions"
+        ],
+        "customizable": true
+      }
+    },
+    "features": {
+      "keyboardShortcuts": true,
+      "tooltips": true,
+      "animations": true,
+      "compactMode": false,
+      "advancedFilters": true
+    }
+  },
+  "localization": {
+    "defaultLanguage": "en",
+    "supportedLanguages": ["en", "es", "fr", "de", "it", "pt", "ja", "ko"],
+    "fallbackLanguage": "en",
+    "rtlSupport": false,
+    "dateFormat": "YYYY-MM-DD",
+    "timeFormat": "HH:mm:ss",
+    "currency": "USD"
+  },
+  "experimental": {
+    "aiImageAnalysis": {
+      "enabled": false,
+      "model": "claude-3-vision",
+      "maxImageSize": 5242880,
+      "supportedFormats": ["jpg", "png", "webp"]
+    },
+    "voiceSearchOptimization": {
+      "enabled": false,
+      "targetQuestions": true,
+      "conversationalKeywords": true
+    },
+    "predictiveAnalytics": {
+      "enabled": false,
+      "modelVersion": "v1.0",
+      "confidenceThreshold": 0.8
+    }
+  },
+  "maintenance": {
+    "scheduled": {
+      "enabled": false,
+      "startTime": "02:00",
+      "duration": 60,
+      "timezone": "UTC",
+      "message": "System maintenance in progress"
+    },
+    "backup": {
+      "enabled": true,
+      "frequency": "daily",
+      "retention": 30,
+      "compression": true,
+      "encryption": true
+    },
+    "cleanup": {
+      "enabled": true,
+      "schedule": "0 2 * * *",
+      "tasks": [
+        "expired_cache",
+        "old_logs",
+        "temp_files",
+        "failed_operations"
+      ]
+    }
+  },
+  "compliance": {
+    "gdpr": {
+      "enabled": true,
+      "dataRetention": 365,
+      "anonymization": true,
+      "consentTracking": true
+    },
+    "ccpa": {
+      "enabled": true,
+      "optOutSupport": true,
+      "dataDisclosure": true
+    },
+    "accessibility": {
+      "wcagLevel": "AA",
+      "keyboardNavigation": true,
+      "screenReaderSupport": true,
+      "highContrast": true
+    }
+  }
+}

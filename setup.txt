@@ -1,0 +1,25 @@
+
+> shopify-app-js--root@1.0.0 npx
+> create-app
+
+?  Get started building your app:
+✔  Build a Remix app (recommended)
+
+?  For your Remix template, which language do you want?
+✔  TypeScript
+
+?  Create this project as a new app on Shopify?
+✔  Yes, create it as a new app
+
+│                                                                                                             │
+│  seo-automation is ready for you to build!                                                                  │
+│                                                                                                             │
+│  Next steps                                                                                                 │
+│    • Run `cd seo-automation`                                                                                │
+│    • For extensions, run `shopify app generate extension`                                                   │
+│    • To see your app, run `shopify app dev`                                                                 │
+│                                                                                                             │
+│  Reference                                                                                                  │
+│    • Shopify docs [1]                                                                                       │
+│    • For an overview of commands, run `shopify app --help`                                                  │
+│                                                                                                             │

@@ -1,0 +1,609 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "defaultParameters": {
+    "model": "claude-3-sonnet",
+    "temperature": 0.3,
+    "maxTokens": 2000,
+    "topP": 0.9
+  },
+  "prompts": {
+    "seo_analysis": {
+      "id": "seo_analysis",
+      "name": "SEO Analysis",
+      "category": "analysis",
+      "description": "Comprehensive SEO analysis of content",
+      "version": "1.0.0",
+      "template": "Analyze the SEO performance of this {{resourceType}}:\n\nTitle: {{title}}\nDescription: {{description}}\nContent: {{content}}\n\nShop Context:\n- Name: {{shop.name}}\n- Industry: {{shop.industry}}\n- Target Audience: {{targetAudience}}\n\nBrand Guidelines:\n- Tone: {{brandGuidelines.tone}}\n- Keywords: {{brandGuidelines.keywords}}\n- Avoid Words: {{brandGuidelines.avoidWords}}\n\nPlease provide:\n1. Overall SEO score (0-100)\n2. Detailed analysis of:\n   - Title optimization\n   - Meta description effectiveness\n   - Content quality and keyword usage\n   - Image alt text (if applicable)\n   - Technical SEO elements\n3. Specific issues found with severity levels\n4. Actionable recommendations prioritized by impact\n5. Predicted traffic impact of implementing fixes\n\nFormat the response as structured JSON with clear metrics and explanations.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true,
+          "description": "Type of resource being analyzed"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "description": "Current title"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "description": "Current meta description"
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": false,
+          "description": "Main content"
+        },
+        {
+          "name": "shop",
+          "type": "object",
+          "required": true,
+          "description": "Shop information"
+        },
+        {
+          "name": "targetAudience",
+          "type": "string",
+          "required": false,
+          "description": "Target audience description"
+        },
+        {
+          "name": "brandGuidelines",
+          "type": "object",
+          "required": false,
+          "description": "Brand guidelines"
+        }
+      ],
+      "parameters": {
+        "temperature": 0.2,
+        "maxTokens": 2500,
+        "format": "json"
+      },
+      "examples": [
+        {
+          "input": {
+            "resourceType": "product",
+            "title": "Blue Jeans",
+            "description": "Jeans for sale",
+            "content": "These are blue jeans. They are made of denim.",
+            "shop": {
+              "name": "Fashion Store",
+              "industry": "fashion"
+            }
+          },
+          "output": "Structured JSON analysis with scores and recommendations"
+        }
+      ]
+    },
+    "title_generation": {
+      "id": "title_generation",
+      "name": "Title Generation",
+      "category": "content_generation",
+      "description": "Generate SEO-optimized titles",
+      "version": "1.0.0",
+      "template": "Generate 5 SEO-optimized titles for this {{resourceType}}:\n\nProduct/Content Details:\n- Name: {{name}}\n- Category: {{category}}\n- Key Features: {{features}}\n- Target Keywords: {{keywords}}\n\nShop Context:\n- Shop Name: {{shop.name}}\n- Industry: {{shop.industry}}\n- Brand Voice: {{brandGuidelines.tone}}\n\nRequirements:\n- Length: 50-60 characters\n- Include primary keywords naturally\n- Match brand tone ({{brandGuidelines.tone}})\n- Be compelling and click-worthy\n- Avoid these words: {{brandGuidelines.avoidWords}}\n\nFor each title, provide:\n1. The title text\n2. Character count\n3. Primary keywords used\n4. Estimated CTR impact (1-10)\n5. Brief explanation of strategy\n\nFormat as JSON array with these details for each title option.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "features",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "keywords",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "shop",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "brandGuidelines",
+          "type": "object",
+          "required": false
+        }
+      ],
+      "parameters": {
+        "temperature": 0.5,
+        "maxTokens": 1500,
+        "format": "json"
+      }
+    },
+    "meta_description_generation": {
+      "id": "meta_description_generation",
+      "name": "Meta Description Generation",
+      "category": "content_generation",
+      "description": "Generate compelling meta descriptions",
+      "version": "1.0.0",
+      "template": "Create 3 compelling meta descriptions for this {{resourceType}}:\n\nContent Details:\n- Title: {{title}}\n- Main Content: {{content}}\n- Key Benefits: {{benefits}}\n- Target Keywords: {{keywords}}\n- Call-to-Action: {{cta}}\n\nShop Context:\n- Shop Name: {{shop.name}}\n- Industry: {{shop.industry}}\n- Target Audience: {{targetAudience}}\n\nBrand Guidelines:\n- Tone: {{brandGuidelines.tone}}\n- Key Messages: {{brandGuidelines.valuePropositions}}\n- Avoid Words: {{brandGuidelines.avoidWords}}\n\nRequirements:\n- Length: 150-160 characters\n- Include primary keywords naturally\n- Strong call-to-action\n- Compelling and click-worthy\n- Match brand voice\n- Highlight unique value\n\nFor each description, provide:\n1. The description text\n2. Character count\n3. Keywords included\n4. CTA type used\n5. Estimated CTR improvement\n6. Strategy explanation\n\nFormat as JSON array with detailed analysis.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "benefits",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "keywords",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "cta",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "shop",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "targetAudience",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "brandGuidelines",
+          "type": "object",
+          "required": false
+        }
+      ],
+      "parameters": {
+        "temperature": 0.4,
+        "maxTokens": 1200,
+        "format": "json"
+      }
+    },
+    "content_optimization": {
+      "id": "content_optimization",
+      "name": "Content Optimization",
+      "category": "optimization",
+      "description": "Optimize existing content for SEO",
+      "version": "1.0.0",
+      "template": "Optimize this {{resourceType}} content for SEO:\n\nCurrent Content:\n{{currentContent}}\n\nSEO Context:\n- Target Keywords: {{keywords}}\n- Current SEO Score: {{currentScore}}\n- Main Issues: {{issues}}\n- Competition Level: {{competition}}\n\nOptimization Goals:\n- Improve keyword density to 1-2%\n- Enhance readability\n- Maintain natural flow\n- Include LSI keywords\n- Optimize for search intent\n\nBrand Guidelines:\n- Tone: {{brandGuidelines.tone}}\n- Voice: {{brandGuidelines.voice}}\n- Must Include: {{brandGuidelines.keywords}}\n- Avoid: {{brandGuidelines.avoidWords}}\n\nProvide:\n1. Optimized content version\n2. Changes made with explanations\n3. Keyword density analysis\n4. Readability improvements\n5. Predicted SEO score improvement\n6. Additional recommendations\n\nFormat as structured JSON with before/after comparison.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "currentContent",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "keywords",
+          "type": "array",
+          "required": true
+        },
+        {
+          "name": "currentScore",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "issues",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "competition",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "brandGuidelines",
+          "type": "object",
+          "required": false
+        }
+      ],
+      "parameters": {
+        "temperature": 0.3,
+        "maxTokens": 3000,
+        "format": "json"
+      }
+    },
+    "keyword_analysis": {
+      "id": "keyword_analysis",
+      "name": "Keyword Analysis",
+      "category": "analysis",
+      "description": "Analyze keyword usage and opportunities",
+      "version": "1.0.0",
+      "template": "Analyze keyword usage and opportunities for this {{resourceType}}:\n\nContent Analysis:\n- Title: {{title}}\n- Description: {{description}}\n- Content: {{content}}\n- Current Keywords: {{currentKeywords}}\n\nKeyword Research Context:\n- Industry: {{shop.industry}}\n- Target Audience: {{targetAudience}}\n- Competitors: {{competitors}}\n- Search Intent: {{searchIntent}}\n\nAnalysis Requirements:\n1. Current keyword density analysis\n2. Keyword distribution (title, headings, body, meta)\n3. Missing keyword opportunities\n4. LSI keyword suggestions\n5. Long-tail keyword opportunities\n6. Competitor keyword gaps\n7. Search volume estimates (if known)\n8. Keyword difficulty assessment\n\nProvide recommendations for:\n- Primary keywords (1-2)\n- Secondary keywords (3-5)\n- Long-tail keywords (5-10)\n- LSI keywords (5-10)\n\nFormat as comprehensive JSON analysis with actionable insights.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "currentKeywords",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "shop",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "targetAudience",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "competitors",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "searchIntent",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameters": {
+        "temperature": 0.2,
+        "maxTokens": 2500,
+        "format": "json"
+      }
+    },
+    "competitor_analysis": {
+      "id": "competitor_analysis",
+      "name": "Competitor Analysis",
+      "category": "analysis",
+      "description": "Analyze competitor SEO strategies",
+      "version": "1.0.0",
+      "template": "Analyze competitor SEO strategies and identify opportunities:\n\nOur Content:\n- Title: {{ourTitle}}\n- Description: {{ourDescription}}\n- Content: {{ourContent}}\n- Keywords: {{ourKeywords}}\n\nCompetitor Data:\n{{#competitors}}\nCompetitor {{@index}}:\n- URL: {{url}}\n- Title: {{title}}\n- Description: {{description}}\n- Estimated Keywords: {{keywords}}\n- Content Snippet: {{contentSnippet}}\n{{/competitors}}\n\nAnalysis Framework:\n1. Title comparison and opportunities\n2. Meta description analysis\n3. Content depth and quality comparison\n4. Keyword gap analysis\n5. Content structure differences\n6. Unique selling proposition analysis\n7. Technical SEO differences\n\nProvide:\n1. Competitive strength assessment\n2. Our advantages vs competitors\n3. Gaps we need to address\n4. Keyword opportunities they're missing\n5. Content improvement recommendations\n6. Strategic positioning suggestions\n\nFormat as detailed JSON with actionable competitive insights.",
+      "variables": [
+        {
+          "name": "ourTitle",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "ourDescription",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ourContent",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "ourKeywords",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "competitors",
+          "type": "array",
+          "required": true
+        }
+      ],
+      "parameters": {
+        "temperature": 0.3,
+        "maxTokens": 3000,
+        "format": "json"
+      }
+    },
+    "schema_generation": {
+      "id": "schema_generation",
+      "name": "Schema Markup Generation",
+      "category": "technical_seo",
+      "description": "Generate structured data markup",
+      "version": "1.0.0",
+      "template": "Generate appropriate schema markup for this {{resourceType}}:\n\nContent Details:\n- Name/Title: {{name}}\n- Description: {{description}}\n- Category: {{category}}\n- Price: {{price}}\n- Brand: {{brand}}\n- Images: {{images}}\n- Ratings: {{ratings}}\n- Additional Data: {{additionalData}}\n\nShop Information:\n- Shop Name: {{shop.name}}\n- Domain: {{shop.domain}}\n- Contact: {{shop.contact}}\n\nSchema Requirements:\n- Use appropriate schema.org type for {{resourceType}}\n- Include all available properties\n- Ensure proper nesting\n- Validate against schema.org standards\n- Optimize for rich snippets\n\nGenerate:\n1. JSON-LD structured data\n2. Property mapping explanation\n3. Rich snippet opportunities\n4. Validation recommendations\n5. Implementation notes\n\nFormat as valid JSON-LD with comprehensive property coverage.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "price",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "brand",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "images",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "ratings",
+          "type": "object",
+          "required": false
+        },
+        {
+          "name": "additionalData",
+          "type": "object",
+          "required": false
+        },
+        {
+          "name": "shop",
+          "type": "object",
+          "required": true
+        }
+      ],
+      "parameters": {
+        "temperature": 0.1,
+        "maxTokens": 2000,
+        "format": "json"
+      }
+    },
+    "alt_text_generation": {
+      "id": "alt_text_generation",
+      "name": "Alt Text Generation",
+      "category": "content_generation",
+      "description": "Generate descriptive alt text for images",
+      "version": "1.0.0",
+      "template": "Generate SEO-optimized alt text for images in this {{resourceType}}:\n\nImage Context:\n- Product/Content: {{productName}}\n- Image Description: {{imageDescription}}\n- Image Type: {{imageType}} (main, lifestyle, detail, etc.)\n- Visible Elements: {{visibleElements}}\n- Context: {{context}}\n\nSEO Context:\n- Target Keywords: {{keywords}}\n- Category: {{category}}\n- Brand: {{brand}}\n\nAlt Text Requirements:\n- Maximum 125 characters\n- Descriptive and specific\n- Include relevant keywords naturally\n- Accessible for screen readers\n- Avoid \"image of\" or \"picture of\"\n- Be specific about what's shown\n\nFor each image, provide:\n1. Optimized alt text\n2. Character count\n3. Keywords included\n4. Accessibility score (1-10)\n5. SEO value score (1-10)\n6. Alternative versions\n\nFormat as JSON array with detailed analysis for each alt text option.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "productName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "imageDescription",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "imageType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "visibleElements",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "context",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "keywords",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "brand",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameters": {
+        "temperature": 0.4,
+        "maxTokens": 1000,
+        "format": "json"
+      }
+    },
+    "bulk_optimization": {
+      "id": "bulk_optimization",
+      "name": "Bulk Content Optimization",
+      "category": "bulk_operations",
+      "description": "Optimize multiple items efficiently",
+      "version": "1.0.0",
+      "template": "Optimize multiple {{resourceType}} items for SEO:\n\nBatch Context:\n- Total Items: {{itemCount}}\n- Resource Type: {{resourceType}}\n- Optimization Strategy: {{strategy}}\n- Time Constraint: {{timeConstraint}}\n\nGlobal Settings:\n- Target Keywords: {{globalKeywords}}\n- Brand Guidelines: {{brandGuidelines}}\n- Quality Threshold: {{qualityThreshold}}\n\nItems to Optimize:\n{{#items}}\nItem {{@index}}:\n- ID: {{id}}\n- Current Title: {{title}}\n- Current Description: {{description}}\n- Category: {{category}}\n- Priority: {{priority}}\n{{/items}}\n\nOptimization Requirements:\n- Maintain brand consistency\n- Ensure unique titles/descriptions\n- Optimize keyword usage\n- Improve click-through potential\n- Consider category-specific best practices\n\nFor each item, provide:\n1. Optimized title\n2. Optimized description\n3. Key improvements made\n4. Estimated impact score\n5. Implementation priority\n\nFormat as JSON array with batch optimization results.",
+      "variables": [
+        {
+          "name": "resourceType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "itemCount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "name": "strategy",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "timeConstraint",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "globalKeywords",
+          "type": "array",
+          "required": false
+        },
+        {
+          "name": "brandGuidelines",
+          "type": "object",
+          "required": false
+        },
+        {
+          "name": "qualityThreshold",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "items",
+          "type": "array",
+          "required": true
+        }
+      ],
+      "parameters": {
+        "temperature": 0.3,
+        "maxTokens": 4000,
+        "format": "json"
+      }
+    }
+  },
+  "strategies": {
+    "conservative": {
+      "name": "Conservative",
+      "description": "Safe, minimal changes that preserve existing content",
+      "parameters": {
+        "temperature": 0.2,
+        "preserveOriginal": 0.8,
+        "riskLevel": "low"
+      }
+    },
+    "balanced": {
+      "name": "Balanced",
+      "description": "Moderate optimization with good balance of preservation and improvement",
+      "parameters": {
+        "temperature": 0.3,
+        "preserveOriginal": 0.6,
+        "riskLevel": "medium"
+      }
+    },
+    "aggressive": {
+      "name": "Aggressive",
+      "description": "Significant changes for maximum SEO impact",
+      "parameters": {
+        "temperature": 0.4,
+        "preserveOriginal": 0.3,
+        "riskLevel": "high"
+      }
+    },
+    "creative": {
+      "name": "Creative",
+      "description": "Innovative approaches with creative content generation",
+      "parameters": {
+        "temperature": 0.6,
+        "preserveOriginal": 0.2,
+        "riskLevel": "high"
+      }
+    }
+  },
+  "quality_checks": {
+    "title": {
+      "minLength": 30,
+      "maxLength": 60,
+      "requiredElements": ["keywords", "brand"],
+      "forbiddenWords": ["cheap", "free", "click here"]
+    },
+    "description": {
+      "minLength": 120,
+      "maxLength": 160,
+      "requiredElements": ["keywords", "cta"],
+      "forbiddenWords": ["spam", "guaranteed"]
+    },
+    "content": {
+      "minWords": 300,
+      "maxKeywordDensity": 0.03,
+      "requiredElements": ["headings", "keywords"],
+      "readabilityScore": 60
+    },
+    "altText": {
+      "minLength": 10,
+      "maxLength": 125,
+      "requiredElements": ["description"],
+      "forbiddenWords": ["image of", "picture of"]
+    }
+  },
+  "fallback_prompts": {
+    "generic_optimization": "Optimize this content for SEO while maintaining readability and brand consistency.",
+    "error_handling": "Please analyze the provided content and suggest improvements based on SEO best practices.",
+    "minimal_context": "Improve the SEO value of this content with the available information."
+  },
+  "prompt_chains": {
+    "full_seo_audit": [
+      "seo_analysis",
+      "keyword_analysis",
+      "competitor_analysis",
+      "content_optimization"
+    ],
+    "content_creation": [
+      "title_generation",
+      "meta_description_generation",
+      "schema_generation"
+    ],
+    "image_optimization": [
+      "alt_text_generation"
+    ]
+  }
+}

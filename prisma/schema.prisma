@@ -1,0 +1,706 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+// Shopify Session Management
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  
+  // Relations
+  shopInfo      Shop?     @relation(fields: [shop], references: [domain])
+  
+  @@index([shop])
+  @@index([userId])
+}
+
+// Shop Information
+model Shop {
+  id                    String    @id @default(cuid())
+  domain                String    @unique
+  name                  String
+  description           String?
+  
+  // Plan and billing
+  plan                  String    @default("basic")
+  billingCycle          String    @default("monthly") // monthly, annual
+  trialEndsAt           DateTime?
+  
+  // Configuration
+  timezone              String    @default("UTC")
+  currency              String    @default("USD")
+  locale                String    @default("en")
+  
+  // SEO app specific
+  seoEnabled            Boolean   @default(true)
+  onboardingCompleted   Boolean   @default(false)
+  lastSyncAt            DateTime?
+  
+  // Usage statistics
+  totalProducts         Int       @default(0)
+  totalCollections      Int       @default(0)
+  totalPages            Int       @default(0)
+  totalAnalyses         Int       @default(0)
+  
+  // Limits
+  monthlyAnalysisLimit  Int       @default(100)
+  monthlyAnalysisUsed   Int       @default(0)
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  sessions              Session[]
+  users                 User[]
+  audits                SEOAudit[]
+  bulkOperations        BulkOperation[]
+  claudeRequests        ClaudeRequest[]
+  settings              ShopSettings?
+  
+  @@index([domain])
+  @@index([plan])
+}
+
+// User Management
+model User {
+  id                    String    @id @default(cuid())
+  shopId                String
+  
+  // Basic info
+  firstName             String
+  lastName              String
+  email                 String
+  avatar                String?
+  
+  // Role and permissions
+  role                  String    @default("editor") // owner, admin, editor, viewer
+  
+  // Activity tracking
+  lastActiveAt          DateTime  @default(now())
+  lastLoginAt           DateTime  @default(now())
+  loginCount            Int       @default(1)
+  
+  // Onboarding
+  onboardingStep        Int?
+  onboardingCompleted   Boolean   @default(false)
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  shop                  Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  preferences           UserPreferences?
+  claudeRequests        ClaudeRequest[]
+  
+  @@unique([shopId, email])
+  @@index([shopId])
+  @@index([email])
+}
+
+// User Preferences
+model UserPreferences {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  
+  // UI preferences
+  theme                 String    @default("light") // light, dark, auto
+  language              String    @default("en")
+  timezone              String    @default("UTC")
+  
+  // Analysis preferences
+  defaultAnalysisDepth  String    @default("standard") // quick, standard, comprehensive
+  autoFixEnabled        Boolean   @default(false)
+  bulkEditWarnings      Boolean   @default(true)
+  
+  // Notification preferences
+  emailNotifications    Json      @default("{}")
+  inAppNotifications    Json      @default("{}")
+  
+  // Dashboard preferences
+  dashboardLayout       Json      @default("{}")
+  defaultDateRange      String    @default("last_30_days")
+  showTips              Boolean   @default(true)
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Shop Settings
+model ShopSettings {
+  id                    String    @id @default(cuid())
+  shopId                String    @unique
+  
+  // General settings
+  appName               String    @default("SEO Automation")
+  appVersion            String    @default("1.0.0")
+  maintenance           Boolean   @default(false)
+  
+  // Analysis settings
+  analysisSettings      Json      @default("{}")
+  
+  // Claude integration
+  claudeSettings        Json      @default("{}")
+  
+  // Limits and quotas
+  limits                Json      @default("{}")
+  
+  // Integration settings
+  integrations          Json      @default("{}")
+  
+  // Security settings
+  security              Json      @default("{}")
+  
+  // Notification settings
+  notifications         Json      @default("{}")
+  
+  // Feature flags
+  features              Json      @default("{}")
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  shop                  Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+// SEO Audit Results
+model SEOAudit {
+  id                    String    @id @default(cuid())
+  shopId                String
+  shopDomain            String
+  resourceType          String    // product, collection, page, blog, article
+  resourceId            String
+  resourceHandle        String
+  
+  // Scoring details
+  score                 Float
+  scoreBreakdown        Json
+  previousScore         Float?
+  
+  // Issues and fixes
+  issues                Json      @default("[]")
+  criticalIssues        Int       @default(0)
+  warnings              Int       @default(0)
+  suggestions           Json      @default("[]")
+  autoFixed             Boolean   @default(false)
+  fixedIssues           Json      @default("[]")
+  
+  // Analysis metadata
+  lastScanned           DateTime  @default(now())
+  scanDuration          Int       // milliseconds
+  scanMethod            String    @default("manual") // manual, scheduled, webhook
+  analyzedBy            String    @default("internal") // claude, internal, hybrid
+  
+  // Performance metrics
+  pageSpeed             Json?
+  mobileScore           Float?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  shop                  Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  improvements          SEOImprovement[]
+  competitorAnalyses    CompetitorAnalysis[]
+  keywordTracking       KeywordTracking[]
+  
+  @@index([shopId])
+  @@index([resourceType])
+  @@index([resourceId])
+  @@index([score])
+  @@index([lastScanned])
+}
+
+// SEO Improvements
+model SEOImprovement {
+  id                    String    @id @default(cuid())
+  auditId               String
+  field                 String
+  fieldPath             String?
+  
+  // Change tracking
+  beforeValue           String?
+  afterValue            String
+  changeType            String    // add, update, remove, optimize
+  
+  // Impact analysis
+  impact                Float     // SEO score impact (-100 to +100)
+  impactDetails         Json
+  confidence            Float     // AI confidence level (0-1)
+  
+  // Execution details
+  status                String    @default("pending") // pending, applied, failed, reverted
+  appliedAt             DateTime?
+  appliedBy             String?
+  failureReason         String?
+  
+  // A/B testing
+  isVariant             Boolean   @default(false)
+  variantGroup          String?
+  performance           Json?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  audit                 SEOAudit  @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  
+  @@index([auditId])
+  @@index([status])
+  @@index([appliedAt])
+}
+
+// Competitor Analysis
+model CompetitorAnalysis {
+  id                    String    @id @default(cuid())
+  auditId               String
+  competitorUrl         String
+  
+  // Comparison metrics
+  theirScore            Float
+  ourScore              Float
+  gap                   Float
+  
+  // Detailed comparison
+  titleComparison       Json
+  metaComparison        Json
+  contentAnalysis       Json
+  keywordOverlap        Float
+  
+  // Recommendations
+  opportunities         Json      @default("[]")
+  advantages            Json      @default("[]")
+  
+  // Timestamps
+  analyzedAt            DateTime  @default(now())
+  createdAt             DateTime  @default(now())
+  
+  // Relations
+  audit                 SEOAudit  @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  
+  @@index([auditId])
+  @@index([competitorUrl])
+}
+
+// Keyword Tracking
+model KeywordTracking {
+  id                    String    @id @default(cuid())
+  auditId               String
+  keyword               String
+  
+  // Tracking metrics
+  density               Float
+  prominence            Float
+  occurrences           Int
+  distribution          Json
+  
+  // Optimization status
+  isTarget              Boolean   @default(false)
+  isOptimized           Boolean   @default(false)
+  recommendations       Json      @default("[]")
+  
+  // Performance tracking
+  position              Int?
+  searchVolume          Int?
+  difficulty            Float?
+  cpc                   Float?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  audit                 SEOAudit  @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  
+  @@index([auditId])
+  @@index([keyword])
+  @@index([isTarget])
+}
+
+// Bulk Operations
+model BulkOperation {
+  id                    String    @id @default(cuid())
+  shopId                String
+  type                  String    // analyze, fix, optimize, export
+  resourceType          String    // product, collection, page, all
+  resourceIds           Json      @default("[]")
+  
+  // Operation details
+  status                String    @default("pending") // pending, running, paused, completed, failed, cancelled
+  progress              Json      @default("{}")
+  results               Json?
+  
+  // Configuration
+  config                Json      @default("{}")
+  priority              String    @default("normal") // low, normal, high
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  startedAt             DateTime?
+  completedAt           DateTime?
+  estimatedCompletionAt DateTime?
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  shop                  Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  
+  @@index([shopId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// Claude AI Integration
+model ClaudeRequest {
+  id                    String    @id @default(cuid())
+  shopId                String
+  userId                String?
+  type                  String    // seo_analysis, title_generation, etc.
+  
+  // Request details
+  prompt                String
+  context               Json
+  parameters            Json
+  
+  // Resource information
+  resourceType          String?
+  resourceId            String?
+  resourceData          Json?
+  
+  // Status tracking
+  status                String    @default("pending") // pending, processing, completed, failed, cancelled
+  response              Json?
+  
+  // Usage tracking
+  tokensUsed            Int?
+  cost                  Float?
+  processingTime        Int?      // milliseconds
+  
+  // Retry logic
+  attempts              Int       @default(0)
+  maxAttempts           Int       @default(3)
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  startedAt             DateTime?
+  completedAt           DateTime?
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  shop                  Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  user                  User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([shopId])
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// SEO Templates
+model SEOTemplate {
+  id                    String    @id @default(cuid())
+  name                  String
+  description           String
+  resourceType          String    // product, collection, page, blog, all
+  category              String
+  
+  // Template rules
+  rules                 Json      @default("[]")
+  variables             Json      @default("[]")
+  
+  // Usage stats
+  usageCount            Int       @default(0)
+  successRate           Float     @default(0)
+  averageImprovement    Float     @default(0)
+  
+  // Meta
+  active                Boolean   @default(true)
+  isBuiltIn             Boolean   @default(false)
+  createdBy             String?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([resourceType])
+  @@index([category])
+  @@index([active])
+}
+
+// SEO Rules Engine
+model SEORule {
+  id                    String    @id @default(cuid())
+  name                  String
+  description           String
+  category              String    // title, meta, image, content, technical, performance
+  
+  // Rule logic
+  condition             Json
+  action                Json
+  
+  // Configuration
+  priority              Int       @default(5) // 1-10, 10 highest
+  severity              String    @default("medium") // low, medium, high, critical
+  enabled               Boolean   @default(true)
+  autoFix               Boolean   @default(false)
+  
+  // Scope
+  scope                 Json      @default("{}")
+  
+  // Meta
+  version               String    @default("1.0.0")
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([category])
+  @@index([enabled])
+  @@index([priority])
+}
+
+// Queue Management
+model SEOQueue {
+  id                    String    @id @default(cuid())
+  shopId                String
+  taskType              String    // analyze, fix, generate, export, crawl
+  payload               Json
+  
+  // Priority and scheduling
+  priority              Int       @default(5) // 1-10, 10 highest
+  scheduledFor          DateTime?
+  
+  // Status tracking
+  status                String    @default("pending") // pending, processing, completed, failed, cancelled
+  attempts              Int       @default(0)
+  maxAttempts           Int       @default(3)
+  
+  // Execution details
+  startedAt             DateTime?
+  completedAt           DateTime?
+  processingTime        Int?      // milliseconds
+  
+  // Results
+  result                Json?
+  error                 Json?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([shopId])
+  @@index([status])
+  @@index([priority])
+  @@index([scheduledFor])
+  @@index([createdAt])
+}
+
+// Export Requests
+model ExportRequest {
+  id                    String    @id @default(cuid())
+  shopId                String
+  format                String    // csv, xlsx, json, pdf
+  type                  String    // audit, issues, improvements, competitors, keywords
+  
+  // Filters and options
+  filters               Json      @default("{}")
+  options               Json      @default("{}")
+  
+  // Status
+  status                String    @default("pending") // pending, processing, completed, failed
+  downloadUrl           String?
+  expiresAt             DateTime?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  completedAt           DateTime?
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([shopId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Notifications
+model SEONotification {
+  id                    String    @id @default(cuid())
+  shopId                String
+  type                  String    // analysis_complete, fix_applied, issue_detected, export_ready, system_alert
+  
+  // Content
+  title                 String
+  message               String
+  data                  Json?
+  
+  // Delivery
+  channels              Json      @default("[]") // in_app, email, slack, webhook
+  priority              String    @default("normal") // low, normal, high, urgent
+  
+  // Status
+  status                String    @default("pending") // pending, sent, failed
+  readAt                DateTime?
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  expiresAt             DateTime?
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([shopId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Analytics and Usage
+model UsageAnalytics {
+  id                    String    @id @default(cuid())
+  shopId                String
+  period                String    // hour, day, week, month
+  startDate             DateTime
+  endDate               DateTime
+  
+  // Request metrics
+  totalRequests         Int       @default(0)
+  successfulRequests    Int       @default(0)
+  failedRequests        Int       @default(0)
+  
+  // Token usage (for Claude)
+  inputTokens           Int       @default(0)
+  outputTokens          Int       @default(0)
+  totalTokens           Int       @default(0)
+  
+  // Cost tracking
+  totalCost             Float     @default(0)
+  costByModel           Json      @default("{}")
+  costByType            Json      @default("{}")
+  
+  // Performance metrics
+  averageLatency        Float     @default(0)
+  averageQuality        Float     @default(0)
+  
+  // Usage patterns
+  data                  Json      @default("{}")
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([shopId, period, startDate])
+  @@index([shopId])
+  @@index([period])
+  @@index([startDate])
+}
+
+// Cache Management
+model CacheEntry {
+  id                    String    @id @default(cuid())
+  key                   String    @unique
+  requestHash           String
+  response              Json
+  
+  // Cache metadata
+  hitCount              Int       @default(0)
+  lastAccessed          DateTime  @default(now())
+  expiresAt             DateTime
+  
+  // Validation
+  isValid               Boolean   @default(true)
+  validationScore       Float     @default(1.0)
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([key])
+  @@index([expiresAt])
+  @@index([lastAccessed])
+}
+
+// Monitoring and Alerts
+model MonitoringMetric {
+  id                    String    @id @default(cuid())
+  shopId                String?
+  timestamp             DateTime  @default(now())
+  
+  // Performance metrics
+  responseTime          Float?
+  queueTime             Float?
+  tokensPerSecond       Float?
+  
+  // Quality metrics
+  averageQuality        Float?
+  errorRate             Float?
+  successRate           Float?
+  
+  // Resource usage
+  memoryUsage           Float?
+  cpuUsage              Float?
+  
+  // Cost metrics
+  costPerHour           Float?
+  tokenCostRatio        Float?
+  
+  // Additional data
+  data                  Json      @default("{}")
+  
+  @@index([shopId])
+  @@index([timestamp])
+}
+
+// System Configuration
+model SystemConfig {
+  id                    String    @id @default(cuid())
+  key                   String    @unique
+  value                 String
+  type                  String    @default("string") // string, number, boolean, json
+  description           String?
+  
+  // Validation
+  validation            Json?
+  
+  // Meta
+  category              String    @default("general")
+  isSecret              Boolean   @default(false)
+  isReadOnly            Boolean   @default(false)
+  
+  // Timestamps
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([key])
+  @@index([category])
+}

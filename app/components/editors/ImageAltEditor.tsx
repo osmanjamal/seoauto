@@ -1,0 +1,1 @@
+// Bulk alt text editor

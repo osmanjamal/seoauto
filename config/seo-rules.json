@@ -1,0 +1,603 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "categories": {
+    "title": {
+      "name": "Title Optimization",
+      "description": "Rules for optimizing page titles",
+      "weight": 25
+    },
+    "meta": {
+      "name": "Meta Description",
+      "description": "Rules for meta description optimization",
+      "weight": 20
+    },
+    "content": {
+      "name": "Content Quality",
+      "description": "Rules for content optimization",
+      "weight": 20
+    },
+    "images": {
+      "name": "Image Optimization",
+      "description": "Rules for image SEO",
+      "weight": 15
+    },
+    "technical": {
+      "name": "Technical SEO",
+      "description": "Technical SEO rules",
+      "weight": 10
+    },
+    "performance": {
+      "name": "Performance",
+      "description": "Performance-related SEO rules",
+      "weight": 10
+    }
+  },
+  "rules": [
+    {
+      "id": "title_missing",
+      "name": "Missing Title",
+      "category": "title",
+      "description": "Page must have a title tag",
+      "severity": "critical",
+      "priority": 10,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "title",
+        "operator": "empty"
+      },
+      "action": {
+        "type": "generate",
+        "template": "Generate an SEO-optimized title for {{resourceType}} '{{name}}' that includes primary keywords and is between 50-60 characters",
+        "parameters": {
+          "maxLength": 60,
+          "minLength": 30,
+          "includeKeywords": true
+        }
+      },
+      "message": "Title tag is missing. This is critical for SEO.",
+      "impact": {
+        "seo": -30,
+        "traffic": -25,
+        "visibility": -35
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "title_too_long",
+      "name": "Title Too Long",
+      "category": "title",
+      "description": "Title should be 60 characters or less",
+      "severity": "high",
+      "priority": 8,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "title",
+        "operator": "length_greater",
+        "value": 60
+      },
+      "action": {
+        "type": "optimize",
+        "template": "Shorten this title to 60 characters or less while maintaining keywords and clarity: '{{title}}'",
+        "parameters": {
+          "maxLength": 60,
+          "preserveKeywords": true,
+          "maintainClarity": true
+        }
+      },
+      "message": "Title is too long and may be truncated in search results",
+      "impact": {
+        "seo": -15,
+        "traffic": -10,
+        "ctr": -20
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "title_too_short",
+      "name": "Title Too Short",
+      "category": "title",
+      "description": "Title should be at least 30 characters",
+      "severity": "medium",
+      "priority": 6,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "title",
+        "operator": "length_less",
+        "value": 30
+      },
+      "action": {
+        "type": "expand",
+        "template": "Expand this title to be more descriptive while keeping it under 60 characters: '{{title}}'",
+        "parameters": {
+          "minLength": 30,
+          "maxLength": 60,
+          "addKeywords": true
+        }
+      },
+      "message": "Title is too short and may not be descriptive enough",
+      "impact": {
+        "seo": -10,
+        "traffic": -5,
+        "relevance": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "title_duplicate",
+      "name": "Duplicate Title",
+      "category": "title",
+      "description": "Title should be unique across the site",
+      "severity": "high",
+      "priority": 9,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "title",
+        "operator": "duplicate"
+      },
+      "action": {
+        "type": "differentiate",
+        "template": "Make this title unique by adding distinguishing details: '{{title}}'",
+        "parameters": {
+          "addCategory": true,
+          "addBrand": true,
+          "addYear": false
+        }
+      },
+      "message": "Duplicate titles can confuse search engines",
+      "impact": {
+        "seo": -20,
+        "indexing": -25,
+        "ranking": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "meta_missing",
+      "name": "Missing Meta Description",
+      "category": "meta",
+      "description": "Page must have a meta description",
+      "severity": "high",
+      "priority": 9,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "description",
+        "operator": "empty"
+      },
+      "action": {
+        "type": "generate",
+        "template": "Create a compelling meta description for {{resourceType}} '{{name}}' that is 150-160 characters and includes a call-to-action",
+        "parameters": {
+          "maxLength": 160,
+          "minLength": 120,
+          "includeCTA": true,
+          "includeKeywords": true
+        }
+      },
+      "message": "Meta description is missing. This affects click-through rates.",
+      "impact": {
+        "seo": -20,
+        "ctr": -30,
+        "traffic": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "meta_too_long",
+      "name": "Meta Description Too Long",
+      "category": "meta",
+      "description": "Meta description should be 160 characters or less",
+      "severity": "medium",
+      "priority": 7,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "description",
+        "operator": "length_greater",
+        "value": 160
+      },
+      "action": {
+        "type": "shorten",
+        "template": "Shorten this meta description to 160 characters while keeping the most important information: '{{description}}'",
+        "parameters": {
+          "maxLength": 160,
+          "preserveKeywords": true,
+          "maintainCTA": true
+        }
+      },
+      "message": "Meta description may be truncated in search results",
+      "impact": {
+        "seo": -10,
+        "ctr": -15,
+        "visibility": -5
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "meta_too_short",
+      "name": "Meta Description Too Short",
+      "category": "meta",
+      "description": "Meta description should be at least 120 characters",
+      "severity": "low",
+      "priority": 4,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "description",
+        "operator": "length_less",
+        "value": 120
+      },
+      "action": {
+        "type": "expand",
+        "template": "Expand this meta description to be more detailed and compelling: '{{description}}'",
+        "parameters": {
+          "minLength": 120,
+          "maxLength": 160,
+          "addBenefits": true,
+          "addCTA": true
+        }
+      },
+      "message": "Meta description could be more descriptive",
+      "impact": {
+        "seo": -5,
+        "ctr": -10,
+        "engagement": -5
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "alt_text_missing",
+      "name": "Missing Alt Text",
+      "category": "images",
+      "description": "All images must have alt text",
+      "severity": "high",
+      "priority": 8,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "images[].alt",
+        "operator": "empty"
+      },
+      "action": {
+        "type": "generate",
+        "template": "Generate descriptive alt text for this {{resourceType}} image that describes what's shown and includes relevant keywords",
+        "parameters": {
+          "maxLength": 125,
+          "includeKeywords": true,
+          "descriptive": true
+        }
+      },
+      "message": "Images without alt text hurt accessibility and SEO",
+      "impact": {
+        "seo": -15,
+        "accessibility": -25,
+        "image_search": -30
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "alt_text_too_long",
+      "name": "Alt Text Too Long",
+      "category": "images",
+      "description": "Alt text should be 125 characters or less",
+      "severity": "low",
+      "priority": 3,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "images[].alt",
+        "operator": "length_greater",
+        "value": 125
+      },
+      "action": {
+        "type": "shorten",
+        "template": "Shorten this alt text to 125 characters while keeping the essential description: '{{alt}}'",
+        "parameters": {
+          "maxLength": 125,
+          "preserveKeywords": true
+        }
+      },
+      "message": "Alt text is too verbose",
+      "impact": {
+        "seo": -3,
+        "accessibility": -5
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "h1_missing",
+      "name": "Missing H1 Tag",
+      "category": "content",
+      "description": "Page must have exactly one H1 tag",
+      "severity": "high",
+      "priority": 8,
+      "enabled": true,
+      "autoFix": false,
+      "condition": {
+        "field": "h1",
+        "operator": "empty"
+      },
+      "action": {
+        "type": "suggest",
+        "template": "Add an H1 tag with the main heading for this {{resourceType}}",
+        "parameters": {
+          "useTitle": true,
+          "includeKeywords": true
+        }
+      },
+      "message": "Missing H1 tag affects content hierarchy and SEO",
+      "impact": {
+        "seo": -20,
+        "structure": -25,
+        "ranking": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "h1_multiple",
+      "name": "Multiple H1 Tags",
+      "category": "content",
+      "description": "Page should have only one H1 tag",
+      "severity": "medium",
+      "priority": 6,
+      "enabled": true,
+      "autoFix": false,
+      "condition": {
+        "field": "h1",
+        "operator": "count_greater",
+        "value": 1
+      },
+      "action": {
+        "type": "suggest",
+        "template": "Convert additional H1 tags to H2 or H3 tags to maintain proper heading hierarchy",
+        "parameters": {
+          "convertToH2": true
+        }
+      },
+      "message": "Multiple H1 tags can confuse search engines",
+      "impact": {
+        "seo": -10,
+        "structure": -15,
+        "clarity": -10
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "content_thin",
+      "name": "Thin Content",
+      "category": "content",
+      "description": "Content should be substantial and valuable",
+      "severity": "medium",
+      "priority": 5,
+      "enabled": true,
+      "autoFix": false,
+      "condition": {
+        "field": "content",
+        "operator": "word_count_less",
+        "value": 300
+      },
+      "action": {
+        "type": "suggest",
+        "template": "Expand the content to provide more value to users. Consider adding product details, benefits, usage instructions, or related information.",
+        "parameters": {
+          "minWords": 300,
+          "suggestSections": true
+        }
+      },
+      "message": "Content is too thin and may not provide enough value",
+      "impact": {
+        "seo": -15,
+        "engagement": -20,
+        "ranking": -10
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "url_too_long",
+      "name": "URL Too Long",
+      "category": "technical",
+      "description": "URLs should be concise and readable",
+      "severity": "low",
+      "priority": 3,
+      "enabled": true,
+      "autoFix": false,
+      "condition": {
+        "field": "handle",
+        "operator": "length_greater",
+        "value": 50
+      },
+      "action": {
+        "type": "suggest",
+        "template": "Consider shortening the URL handle for better readability and SEO",
+        "parameters": {
+          "maxLength": 50,
+          "removeStopWords": true
+        }
+      },
+      "message": "Long URLs are harder to share and remember",
+      "impact": {
+        "seo": -5,
+        "usability": -10,
+        "sharing": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "keyword_stuffing",
+      "name": "Keyword Stuffing",
+      "category": "content",
+      "description": "Avoid excessive keyword repetition",
+      "severity": "medium",
+      "priority": 6,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "content",
+        "operator": "keyword_density_greater",
+        "value": 0.03
+      },
+      "action": {
+        "type": "optimize",
+        "template": "Reduce keyword density by varying language and using synonyms while maintaining natural flow",
+        "parameters": {
+          "maxDensity": 0.025,
+          "useSynonyms": true,
+          "naturalFlow": true
+        }
+      },
+      "message": "Excessive keyword usage may be penalized by search engines",
+      "impact": {
+        "seo": -20,
+        "penalty_risk": -30,
+        "readability": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    },
+    {
+      "id": "schema_missing",
+      "name": "Missing Schema Markup",
+      "category": "technical",
+      "description": "Structured data helps search engines understand content",
+      "severity": "medium",
+      "priority": 5,
+      "enabled": true,
+      "autoFix": true,
+      "condition": {
+        "field": "schema",
+        "operator": "empty"
+      },
+      "action": {
+        "type": "generate",
+        "template": "Generate appropriate schema markup for this {{resourceType}}",
+        "parameters": {
+          "schemaTypes": {
+            "product": "Product",
+            "collection": "CollectionPage",
+            "page": "WebPage",
+            "blog": "Blog",
+            "article": "Article"
+          }
+        }
+      },
+      "message": "Schema markup can improve search visibility and rich snippets",
+      "impact": {
+        "seo": -10,
+        "rich_snippets": -25,
+        "visibility": -15
+      },
+      "scope": {
+        "resourceTypes": ["product", "collection", "page", "blog", "article"]
+      }
+    }
+  ],
+  "severity_weights": {
+    "critical": 1.0,
+    "high": 0.8,
+    "medium": 0.6,
+    "low": 0.4
+  },
+  "scoring": {
+    "perfect": 100,
+    "excellent": 90,
+    "good": 70,
+    "needs_improvement": 50,
+    "poor": 30,
+    "critical": 0
+  },
+  "templates": {
+    "product": {
+      "title": "{{product.title}} - {{shop.name}}",
+      "description": "{{product.description | truncate: 140}} Shop now at {{shop.name}}!",
+      "schema": "Product"
+    },
+    "collection": {
+      "title": "{{collection.title}} - {{shop.name}}",
+      "description": "Discover our {{collection.title}} collection. {{collection.description | truncate: 120}}",
+      "schema": "CollectionPage"
+    },
+    "page": {
+      "title": "{{page.title}} - {{shop.name}}",
+      "description": "{{page.content | strip_html | truncate: 140}}",
+      "schema": "WebPage"
+    },
+    "blog": {
+      "title": "{{blog.title}} - {{shop.name}}",
+      "description": "Read our latest {{blog.title}} posts and updates.",
+      "schema": "Blog"
+    },
+    "article": {
+      "title": "{{article.title}} - {{blog.title}}",
+      "description": "{{article.excerpt | truncate: 140}}",
+      "schema": "Article"
+    }
+  },
+  "keywords": {
+    "primary_keywords": {
+      "weight": 1.0,
+      "locations": ["title", "h1", "first_paragraph", "meta_description"]
+    },
+    "secondary_keywords": {
+      "weight": 0.7,
+      "locations": ["headings", "content", "alt_text"]
+    },
+    "long_tail_keywords": {
+      "weight": 0.5,
+      "locations": ["content", "meta_description"]
+    }
+  },
+  "performance_thresholds": {
+    "page_speed": {
+      "excellent": 90,
+      "good": 75,
+      "needs_improvement": 50,
+      "poor": 25
+    },
+    "mobile_score": {
+      "excellent": 95,
+      "good": 85,
+      "needs_improvement": 70,
+      "poor": 50
+    }
+  },
+  "automation": {
+    "auto_fix_enabled": true,
+    "safe_fixes_only": true,
+    "backup_before_fix": true,
+    "batch_processing": true,
+    "max_concurrent_fixes": 5,
+    "fix_confirmation_required": false
+  }
+}
